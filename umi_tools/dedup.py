@@ -581,9 +581,9 @@ def get_bundles(insam, ignore_umi=False, subset=None, quality_threshold=0,
         lambda: collections.defaultdict(dict))
 
     if chrom:
-        inreads = insam.fetch(reference=chrom)
+        inreads = insam.fetch(reference=chrom, multiple_iterators=True)
     else:
-        inreads = insam.fetch()
+        inreads = insam.fetch(multiple_iterators=True)
 
     for read in inreads:
 
@@ -650,12 +650,15 @@ def get_bundles(insam, ignore_umi=False, subset=None, quality_threshold=0,
 
             if whole_contig:
                 do_output = not read.tid == last_chr
+                diff_chrom = not read.tid == last_chr
             else:
                 do_output = start > (last_pos+1000) or not read.tid == last_chr
+                diff_chrom = not read.tid == last_chr
 
             if do_output:
 
-                out_keys = [x for x in reads_dict.keys() if x <= start-1000]
+                out_keys = [x for x in reads_dict.keys()
+                            if x <= start-1000 or diff_chrom]
 
                 for p in out_keys:
                     for bundle in reads_dict[p].values():
