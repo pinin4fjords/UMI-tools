@@ -648,17 +648,17 @@ def get_bundles(insam, ignore_umi=False, subset=None, quality_threshold=0,
                      read.cigar[-1][1] > soft_clip_threshold)):
                     is_spliced = True
 
+            different_chrom = not read.tid == last_chr
+
             if whole_contig:
-                do_output = not read.tid == last_chr
-                diff_chrom = not read.tid == last_chr
+                do_output = different_chrom
             else:
-                do_output = start > (last_pos+1000) or not read.tid == last_chr
-                diff_chrom = not read.tid == last_chr
+                do_output = start > (last_pos+1000) or different_chrom
 
             if do_output:
 
                 out_keys = [x for x in reads_dict.keys()
-                            if x <= start-1000 or diff_chrom]
+                            if x <= start - 1000 or different_chrom]
 
                 for p in out_keys:
                     for bundle in reads_dict[p].values():
