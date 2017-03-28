@@ -12,9 +12,11 @@ import collections
 import itertools
 import sys
 import numpy as np
+import os
 
 import pyximport
-pyximport.install(build_in_temp=False)
+pyximport.install(build_in_temp=False, inplace=True,
+                  build_dir = os.path.dirname(__file__))
 
 try:
     from umi_tools._dedup_umi import edit_distance
