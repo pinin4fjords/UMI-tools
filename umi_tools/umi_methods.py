@@ -1144,13 +1144,13 @@ def find_splice(cigar):
     return False
 
 
-def get_read_position(read, soft_clip_threshold):
+def get_read_position(read, soft_clip_threshold, use_softclip):
     ''' get the read position (taking account of clipping) '''
     is_spliced = False
 
     if read.is_reverse:
         pos = read.aend
-        if read.cigar[-1][0] == 4:
+        if read.cigar[-1][0] == 4 and use_softclip:
             pos = pos + read.cigar[-1][1]
         start = read.pos
 
@@ -1162,7 +1162,7 @@ def get_read_position(read, soft_clip_threshold):
             is_spliced = find_splice(cigar)
     else:
         pos = read.pos
-        if read.cigar[0][0] == 4:
+        if read.cigar[0][0] == 4 and use_softclip:
             pos = pos - read.cigar[0][1]
         start = pos
 
@@ -1454,7 +1454,8 @@ class get_bundles:
             else:
 
                 start, pos, is_spliced = get_read_position(
-                    read, self.options.soft_clip_threshold)
+                    read, self.options.soft_clip_threshold,
+                    self.options.get('use_softclip', True))
 
                 do_output, out_keys = self.check_output()
 
