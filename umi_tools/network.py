@@ -507,6 +507,7 @@ class CellClusterer:
             if node not in found:
                 # component = self.search(node, graph)
                 component = breadth_first_search(node, graph)
+                component.sort()
                 found.update(component)
                 components.append(component)
         return components
