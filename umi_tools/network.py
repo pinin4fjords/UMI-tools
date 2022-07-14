@@ -63,7 +63,7 @@ def remove_umis(adj_list, cluster, nodes):
                            for x in nodes
                            for node in adj_list[x]] + nodes)
 
-    return cluster - nodes_to_remove
+    return [x for x in cluster if x not in nodes_to_remove]
 
 
 def get_substr_slices(umi_length, idx_size):
@@ -227,7 +227,8 @@ class UMIClusterer:
         for node in sorted(graph, key=lambda x: counts[x], reverse=True):
             if node not in found:
                 # component = self.search(node, graph)
-                component = breadth_first_search(node, graph)
+                component = list(breadth_first_search(node, graph))
+                component.sort()
                 found.update(component)
                 components.append(component)
         return components
