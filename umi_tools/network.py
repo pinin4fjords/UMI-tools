@@ -227,8 +227,7 @@ class UMIClusterer:
         for node in sorted(graph, key=lambda x: counts[x], reverse=True):
             if node not in found:
                 # component = self.search(node, graph)
-                component = list(breadth_first_search(node, graph))
-                component.sort()
+                component = breadth_first_search(node, graph)
                 found.update(component)
                 components.append(component)
         return components
@@ -436,9 +435,26 @@ class ReadDeduplicator:
                 else:
                     self.umi_whitelist_counts["Non-whitelist UMI"] += cluster_count
         else:
-            final_umis = [cluster[0] for cluster in clusters]
             umi_counts = [sum(counts[umi] for umi in cluster)
                           for cluster in clusters]
+
+            final_umis = []
+            make_deterministic = True
+            if make_deterministic:
+                for cluster in clusters:
+                    # If top UMI in the cluster has the same counts as second
+                    # need to introduce a sort to make it
+                    if len(cluster)>1:
+                        if counts[cluster[0]] == counts[cluster[1]]:
+                            # subset to all umis with the same counts as the top UMI
+                            cluster = [x for x in cluster if counts[x]==counts[cluster[0]]]
+                            # alphabetical sort
+                            cluster.sort()
+
+                    final_umis.append(cluster[0])
+
+            else:
+                final_umis = [cluster[0] for cluster in clusters]
 
         reads = [bundle[umi]["read"] for umi in final_umis]
 
@@ -506,8 +522,7 @@ class CellClusterer:
         for node in sorted(graph, key=lambda x: counts[x], reverse=True):
             if node not in found:
                 # component = self.search(node, graph)
-                component = list(breadth_first_search(node, graph))
-                component.sort()
+                component = breadth_first_search(node, graph)
                 found.update(component)
                 components.append(component)
         return components
